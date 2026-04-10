@@ -12,4 +12,4 @@ printf "Cloning artix-installer...\n"
 sudo pacman -Sy --needed --noconfirm git
 git clone --depth=1 "$REPO_URL" "$CLONE_DIR"
 cd "$CLONE_DIR"
-exec sh ./install.sh </dev/tty
+echo "Run ./install.sh"
