@@ -86,12 +86,11 @@ wget -q https://archlinux.org/mirrorlist/all/ -O /etc/pacman.d/mirrorlist-arch
 sed -i '/^#Server/s/^#//' /etc/pacman.d/mirrorlist-arch
 
 # Uncomment lib32 repository
-sed -i '/^#\[lib32\]/s/^#//' /etc/pacman.conf
-sed -i '/^#Include = \/etc\/pacman.d\/mirrorlist$/s/^#//' /etc/pacman.conf
+sed -i '/^#\[lib32\]/,/^#Include = \/etc\/pacman.d\/mirrorlist/ s/^#//' /etc/pacman.conf
 
 # Add Arch repos to pacman.conf
-printf '\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
-printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
+grep -q "^\[extra\]" /etc/pacman.conf || printf '\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
+grep -q "^\[multilib\]" /etc/pacman.conf || printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
 
 # Populate archlinux keyring
 pacman-key --populate archlinux
