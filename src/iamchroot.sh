@@ -55,11 +55,12 @@ printf 'timeout: 5
 ' "$my_params" >/boot/limine/limine.conf
 
 # Copy Limine EFI files
-cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/
+mkdir -p /boot/EFI/BOOT
 cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/BOOTX64.EFI
 
-# Install Limine bootloader
-limine install /boot
+# Add boot entry
+part_num=$(echo "$PART1" | grep -o '[0-9]*$')
+efibootmgr --create --disk "$MY_DISK" --part "$part_num" --label "Artix (Limine)" --loader '\EFI\BOOT\BOOTX64.EFI'
 
 # Root user
 if [ -n "$ROOT_PASSWORD" ]; then
