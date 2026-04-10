@@ -124,6 +124,8 @@ done
 
 if [ "$SAME_ROOT_PASSWORD" != "y" ]; then
 	ROOT_PASSWORD=$(confirm_password "root password")
+else
+	ROOT_PASSWORD="$USER_PASSWORD"
 fi
 
 printf "\nDone with configuration. Installing...\n\n"
