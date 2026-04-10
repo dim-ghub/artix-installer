@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with artix-installer. If not, see <https://www.gnu.org/licenses/>.
 
-pkgs="base base-devel $MY_INIT sysvinit elogind-$MY_INIT efibootmgr limine btrfs-progs wget dhcpcd wpa_supplicant connman-$MY_INIT hyprland kitty nano sddm sddm-openrc"
+pkgs="base base-devel $MY_INIT elogind-$MY_INIT efibootmgr limine btrfs-progs wget dhcpcd wpa_supplicant connman-$MY_INIT hyprland kitty nano sddm sddm-openrc"
 [ "$ENCRYPTED" = "y" ] && pkgs="$pkgs cryptsetup cryptsetup-$MY_INIT"
 
 # Partition disk
