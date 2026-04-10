@@ -50,11 +50,8 @@ sudo loadkeys "$MY_KEYMAP"
 # Check boot mode
 [ ! -d /sys/firmware/efi ] && printf "Not booted in UEFI mode. Aborting..." && exit 1
 
-# Choose MY_INIT
-until [ "$MY_INIT" = "openrc" ] || [ "$MY_INIT" = "dinit" ]; do
-	printf "Init system (openrc/dinit): " && read -r MY_INIT
-	[ ! "$MY_INIT" ] && MY_INIT="openrc"
-done
+# Boot mode already set to openrc (removed dinit support)
+MY_INIT="openrc"
 
 # Choose disk
 until [ -b "$MY_DISK" ]; do
@@ -113,6 +110,23 @@ done
 # Users
 ROOT_PASSWORD=$(confirm_password "root password")
 
+# Regular user
+until [ "$MY_USER" ]; do
+	printf "Username: " && read -r MY_USER
+done
+
+USER_PASSWORD=$(confirm_password "user password")
+
+# Use same password for root?
+until [ "$SAME_ROOT_PASSWORD" ]; do
+	printf "Use same password for root? (y/N): " && read -r SAME_ROOT_PASSWORD
+	[ ! "$SAME_ROOT_PASSWORD" ] && SAME_ROOT_PASSWORD="n"
+done
+
+if [ "$SAME_ROOT_PASSWORD" != "y" ]; then
+	ROOT_PASSWORD=$(confirm_password "root password")
+fi
+
 printf "\nDone with configuration. Installing...\n\n"
 
 # Install
@@ -126,5 +140,6 @@ sudo cp src/iamchroot.sh /mnt/root/ &&
 	sudo MY_INIT="$MY_INIT" PART2="$PART2" MY_FS="$MY_FS" ENCRYPTED="$ENCRYPTED" \
 		REGION_CITY="$REGION_CITY" MY_HOSTNAME="$MY_HOSTNAME" CRYPTPASS="$CRYPTPASS" \
 		ROOT_PASSWORD="$ROOT_PASSWORD" LANGCODE="$LANGCODE" MY_KEYMAP="$MY_KEYMAP" \
+		MY_USER="$MY_USER" USER_PASSWORD="$USER_PASSWORD" \
 		artix-chroot /mnt sh -ec './root/iamchroot.sh; rm /root/iamchroot.sh; exit' &&
 	printf '\nYou may now poweroff.\n'

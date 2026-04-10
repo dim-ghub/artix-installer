@@ -49,16 +49,41 @@ grub-install --target=x86_64-efi --efi-directory=/boot --removable --recheck
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # Root user
-yes "$ROOT_PASSWORD" | passwd
+if [ -n "$ROOT_PASSWORD" ]; then
+	yes "$ROOT_PASSWORD" | passwd
+fi
+
+# Create regular user
+useradd -m -G wheel -s /bin/bash "$MY_USER"
+yes "$USER_PASSWORD" | passwd "$MY_USER"
 
 sed -i '/%wheel ALL=(ALL) ALL/s/^#//g' /etc/sudoers
+
+# Set up SDDM
+rc-update add sddm default
+
+# Add Artix Arch Linux repository support
+# Install the support package and download Arch mirrorlist
+pacman -Sy --noconfirm artix-archlinux-support
+wget -q https://archlinux.org/mirrorlist/all/ -O /etc/pacman.d/mirrorlist-arch
+sed -i '/^#Server/s/^#//' /etc/pacman.d/mirrorlist-arch
+
+# Uncomment lib32 repository
+sed -i '/^#\[lib32\]/s/^#//' /etc/pacman.conf
+sed -i '/^#Include = \/etc\/pacman.d\/mirrorlist$/s/^#//' /etc/pacman.conf
+
+# Add Arch repos to pacman.conf
+printf '\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
+printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
+
+# Populate archlinux keyring
+pacman-key --populate archlinux
+pacman -Sy
 
 # Other stuff you should do
 if [ "$MY_INIT" = "openrc" ]; then
 	sed -i '/rc_need="localmount"/s/^#//g' /etc/conf.d/swap
 	rc-update add connmand default
-elif [ "$MY_INIT" = "dinit" ]; then
-	ln -s /etc/dinit.d/connmand /etc/dinit.d/boot.d/
 fi
 
 # Configure mkinitcpio
