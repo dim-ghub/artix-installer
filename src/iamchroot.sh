@@ -38,9 +38,9 @@ printf "\n127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t%s.localdomain\t%s\
 root_uuid=$(blkid "$PART2" -o value -s UUID)
 
 if [ "$ENCRYPTED" = "y" ]; then
-	my_params="cryptdevice=UUID=$root_uuid:root root=\/dev\/mapper\/root rw"
+	my_params="cryptdevice=UUID=$root_uuid:root root=\/dev\/mapper\/root rw rootflags=subvol=root"
 else
-	my_params="root=UUID=$root_uuid rw"
+	my_params="root=UUID=$root_uuid rw rootflags=subvol=root"
 fi
 
 # Create limine configuration
