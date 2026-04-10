@@ -34,19 +34,32 @@ printf '%s\n' "$MY_HOSTNAME" >/etc/hostname
 [ "$MY_INIT" = "openrc" ] && printf 'hostname="%s"\n' "$MY_HOSTNAME" >/etc/conf.d/hostname
 printf "\n127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t%s.localdomain\t%s\n" "$MY_HOSTNAME" "$MY_HOSTNAME" >/etc/hosts
 
-# Install boot loader
+# Install boot loader (Limine)
 root_uuid=$(blkid "$PART2" -o value -s UUID)
 
 if [ "$ENCRYPTED" = "y" ]; then
-	my_params="cryptdevice=UUID=$root_uuid:root root=\/dev\/mapper\/root"
+	my_params="cryptdevice=UUID=$root_uuid:root root=\/dev\/mapper\/root rw"
+else
+	my_params="root=UUID=$root_uuid rw"
 fi
 
-sed -i "s/^GRUB_CMDLINE_LINUX_DEFAULT.*$/GRUB_CMDLINE_LINUX_DEFAULT=\"$my_params\"/g" /etc/default/grub
-[ "$ENCRYPTED" = "y" ] && sed -i '/GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
+# Create limine configuration
+mkdir -p /boot/limine
+printf 'timeout: 5
 
-grub-install --target=x86_64-efi --efi-directory=/boot --recheck
-grub-install --target=x86_64-efi --efi-directory=/boot --removable --recheck
-grub-mkconfig -o /boot/grub/grub.cfg
+/Artix
+    protocol: linux
+    kernel_path: boot():/vmlinuz-linux
+    cmdline: %s
+    module_path: boot():/initramfs-linux.img
+' "$my_params" >/boot/limine/limine.conf
+
+# Copy Limine EFI files
+cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/
+cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/BOOTX64.EFI
+
+# Install Limine bootloader
+limine install /boot
 
 # Root user
 if [ -n "$ROOT_PASSWORD" ]; then
