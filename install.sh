@@ -107,9 +107,6 @@ until [ "$MY_HOSTNAME" ]; do
 	printf "Hostname: " && read -r MY_HOSTNAME
 done
 
-# Users
-ROOT_PASSWORD=$(confirm_password "root password")
-
 # Regular user
 until [ "$MY_USER" ]; do
 	printf "Username: " && read -r MY_USER
