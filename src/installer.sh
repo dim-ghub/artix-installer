@@ -19,8 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with artix-installer. If not, see <https://www.gnu.org/licenses/>.
 
-pkgs="base base-devel $MY_INIT elogind-$MY_INIT efibootmgr limine dhcpcd wpa_supplicant connman-$MY_INIT hyprland kitty nano sddm sddm-openrc"
-[ "$MY_FS" = "btrfs" ] && pkgs="$pkgs btrfs-progs"
+pkgs="base base-devel $MY_INIT elogind-$MY_INIT efibootmgr limine btrfs-progs dhcpcd wpa_supplicant connman-$MY_INIT hyprland kitty nano sddm sddm-openrc"
 [ "$ENCRYPTED" = "y" ] && pkgs="$pkgs cryptsetup cryptsetup-$MY_INIT"
 
 # Partition disk
@@ -34,35 +33,25 @@ fi
 
 mkfs.fat -F 32 "$PART1"
 
-if [ "$MY_FS" = "ext4" ]; then
-	yes | mkfs.ext4 "$MY_ROOT"
-	mount "$MY_ROOT" /mnt
+# Btrfs setup
+mkfs.btrfs -f "$MY_ROOT"
 
-	# Create swapfile
-	mkdir /mnt/swap
-	fallocate -l "$SWAP_SIZE"G /mnt/swap/swapfile
-	chmod 600 /mnt/swap/swapfile
-	mkswap /mnt/swap/swapfile
-elif [ "$MY_FS" = "btrfs" ]; then
-	mkfs.btrfs -f "$MY_ROOT"
+# Create subvolumes
+mount "$MY_ROOT" /mnt
+btrfs subvolume create /mnt/root
+btrfs subvolume create /mnt/home
+btrfs subvolume create /mnt/swap
+umount -R /mnt
 
-	# Create subvolumes
-	mount "$MY_ROOT" /mnt
-	btrfs subvolume create /mnt/root
-	btrfs subvolume create /mnt/home
-	btrfs subvolume create /mnt/swap
-	umount -R /mnt
+# Mount subvolumes
+mount -t btrfs -o compress=zstd,subvol=root "$MY_ROOT" /mnt
+mkdir /mnt/home
+mkdir /mnt/swap
+mount -t btrfs -o compress=zstd,subvol=home "$MY_ROOT" /mnt/home
+mount -t btrfs -o noatime,nodatacow,subvol=swap "$MY_ROOT" /mnt/swap
 
-	# Mount subvolumes
-	mount -t btrfs -o compress=zstd,subvol=root "$MY_ROOT" /mnt
-	mkdir /mnt/home
-	mkdir /mnt/swap
-	mount -t btrfs -o compress=zstd,subvol=home "$MY_ROOT" /mnt/home
-	mount -t btrfs -o noatime,nodatacow,subvol=swap "$MY_ROOT" /mnt/swap
-
-	# Create swapfile
-	btrfs filesystem mkswapfile -s "$SWAP_SIZE"G /mnt/swap/swapfile
-fi
+# Create swapfile
+btrfs filesystem mkswapfile -s "$SWAP_SIZE"G /mnt/swap/swapfile
 
 swapon /mnt/swap/swapfile
 

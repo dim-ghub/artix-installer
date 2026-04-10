@@ -103,7 +103,7 @@ if [ "$MY_INIT" = "openrc" ]; then
 fi
 
 # Configure mkinitcpio
-[ "$MY_FS" = "btrfs" ] && sed -i 's/BINARIES=()/BINARIES=(\/usr\/bin\/btrfs)/g' /etc/mkinitcpio.conf
+sed -i 's/BINARIES=()/BINARIES=(\/usr\/bin\/btrfs)/g' /etc/mkinitcpio.conf
 if [ "$ENCRYPTED" = "y" ]; then
 	sed -i 's/^HOOKS.*$/HOOKS=(base udev autodetect keyboard keymap modconf block encrypt filesystems fsck)/g' /etc/mkinitcpio.conf
 else

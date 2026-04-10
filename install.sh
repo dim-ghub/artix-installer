@@ -76,11 +76,8 @@ until (echo "$SWAP_SIZE" | grep -Eq "^[0-9]+$") && [ "$SWAP_SIZE" -gt 0 ] && [ "
 	[ ! "$SWAP_SIZE" ] && SWAP_SIZE=4
 done
 
-# Choose filesystem
-until [ "$MY_FS" = "btrfs" ] || [ "$MY_FS" = "ext4" ]; do
-	printf "Filesystem (btrfs/ext4): " && read -r MY_FS
-	[ ! "$MY_FS" ] && MY_FS="btrfs"
-done
+# Filesystem is always btrfs
+MY_FS="btrfs"
 
 # Encrypt or not
 until [ "$ENCRYPTED" ]; do
@@ -93,7 +90,6 @@ if [ "$ENCRYPTED" = "y" ]; then
 	CRYPTPASS=$(confirm_password "encryption password")
 else
 	MY_ROOT=$PART2
-	[ "$MY_FS" = "ext4" ] && MY_ROOT=$PART2
 fi
 
 # Timezone
@@ -134,13 +130,13 @@ printf "\nDone with configuration. Installing...\n\n"
 
 # Install
 sudo MY_INIT="$MY_INIT" MY_DISK="$MY_DISK" PART1="$PART1" PART2="$PART2" \
-	SWAP_SIZE="$SWAP_SIZE" MY_FS="$MY_FS" ENCRYPTED="$ENCRYPTED" MY_ROOT="$MY_ROOT" \
+	SWAP_SIZE="$SWAP_SIZE" ENCRYPTED="$ENCRYPTED" MY_ROOT="$MY_ROOT" \
 	CRYPTPASS="$CRYPTPASS" \
 	./src/installer.sh
 
 # Chroot
 sudo cp src/iamchroot.sh /mnt/root/ &&
-	sudo MY_INIT="$MY_INIT" PART2="$PART2" MY_FS="$MY_FS" ENCRYPTED="$ENCRYPTED" \
+	sudo MY_INIT="$MY_INIT" PART2="$PART2" ENCRYPTED="$ENCRYPTED" \
 		REGION_CITY="$REGION_CITY" MY_HOSTNAME="$MY_HOSTNAME" CRYPTPASS="$CRYPTPASS" \
 		ROOT_PASSWORD="$ROOT_PASSWORD" LANGCODE="$LANGCODE" MY_KEYMAP="$MY_KEYMAP" \
 		MY_USER="$MY_USER" USER_PASSWORD="$USER_PASSWORD" MAKE_SUDOER="$MAKE_SUDOER" \
