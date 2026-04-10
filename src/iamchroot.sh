@@ -54,10 +54,13 @@ if [ -n "$ROOT_PASSWORD" ]; then
 fi
 
 # Create regular user
-useradd -m -G wheel -s /bin/bash "$MY_USER"
+if [ "$MAKE_SUDOER" = "y" ]; then
+	useradd -m -G wheel -s /bin/bash "$MY_USER"
+	sed -i '/%wheel ALL=(ALL) ALL/s/^#//g' /etc/sudoers
+else
+	useradd -m -s /bin/bash "$MY_USER"
+fi
 yes "$USER_PASSWORD" | passwd "$MY_USER"
-
-sed -i '/%wheel ALL=(ALL) ALL/s/^#//g' /etc/sudoers
 
 # Set up SDDM
 rc-update add sddm default

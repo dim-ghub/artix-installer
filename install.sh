@@ -117,6 +117,12 @@ done
 
 USER_PASSWORD=$(confirm_password "user password")
 
+# Make user a sudoer?
+until [ "$MAKE_SUDOER" ]; do
+	printf "Make user a sudoer? (y/N): " && read -r MAKE_SUDOER
+	[ ! "$MAKE_SUDOER" ] && MAKE_SUDOER="n"
+done
+
 # Use same password for root?
 until [ "$SAME_ROOT_PASSWORD" ]; do
 	printf "Use same password for root? (y/N): " && read -r SAME_ROOT_PASSWORD
@@ -140,6 +146,6 @@ sudo cp src/iamchroot.sh /mnt/root/ &&
 	sudo MY_INIT="$MY_INIT" PART2="$PART2" MY_FS="$MY_FS" ENCRYPTED="$ENCRYPTED" \
 		REGION_CITY="$REGION_CITY" MY_HOSTNAME="$MY_HOSTNAME" CRYPTPASS="$CRYPTPASS" \
 		ROOT_PASSWORD="$ROOT_PASSWORD" LANGCODE="$LANGCODE" MY_KEYMAP="$MY_KEYMAP" \
-		MY_USER="$MY_USER" USER_PASSWORD="$USER_PASSWORD" \
+		MY_USER="$MY_USER" USER_PASSWORD="$USER_PASSWORD" MAKE_SUDOER="$MAKE_SUDOER" \
 		artix-chroot /mnt sh -ec './root/iamchroot.sh; rm /root/iamchroot.sh; exit' &&
 	printf '\nYou may now poweroff.\n'
