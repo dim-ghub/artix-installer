@@ -73,6 +73,10 @@ for pkg in $pkgs; do
 	set -- "$@" "$pkg"
 done
 
+# Refresh package databases to avoid 404 errors from stale ISO indexes
+rm -fr /var/lib/pacman/sync
+pacman -Syy
+
 # Install base system and kernel
 basestrap /mnt "$@"
 basestrap /mnt linux linux-firmware linux-headers mkinitcpio

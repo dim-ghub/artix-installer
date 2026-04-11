@@ -27,3 +27,16 @@ sudo pacman -Sy --needed --noconfirm git && git clone --depth=1 https://github.c
 * ISO files can be burned to drives with `dd` or something like Etcher.
 * `sudo dd bs=4M if=/path/to/artix.iso of=/dev/sd[drive letter] status=progress`
 * A better method these days is to use [Ventoy](https://www.ventoy.net/en/index.html).
+
+### Troubleshooting
+
+#### Package 404 errors during installation
+
+If you see `failed retrieving file ... The requested URL returned error: 404` for all mirrors, the ISO's package index is stale (the referenced package versions have been replaced on the mirrors). This installer now automatically refreshes package databases before installing, but if you still encounter this, run manually:
+
+```
+sudo rm -fr /var/lib/pacman/sync
+sudo pacman -Syy
+```
+
+Then re-run the installer.

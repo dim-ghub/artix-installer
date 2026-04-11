@@ -87,14 +87,14 @@ if [ "$MY_INIT" = "openrc" ]; then
 fi
 
 # Add Artix Arch Linux repository support (after all Artix package installs so Artix repos take priority)
-pacman -Sy --noconfirm artix-archlinux-support
+pacman -Syy --noconfirm artix-archlinux-support
 
 sed -i '/^#\[lib32\]/,/^#Include = \/etc\/pacman.d\/mirrorlist/ s/^#//' /etc/pacman.conf
 grep -q "^\[extra\]" /etc/pacman.conf || printf '\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
 grep -q "^\[multilib\]" /etc/pacman.conf || printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
 
 pacman-key --populate archlinux
-pacman -Sy
+pacman -Syy
 
 # Configure mkinitcpio
 sed -i 's/BINARIES=()/BINARIES=(\/usr\/bin\/btrfs)/g' /etc/mkinitcpio.conf
