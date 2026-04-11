@@ -17,7 +17,7 @@ In Connman, use: `agent on`, `scan wifi`, `services`, `connect wifi_NAME`, `quit
 
 3. Acquire the install scripts and run:
 ```
-sudo pacman -Sy --needed git && git clone --depth=1 https://github.com/dim-ghub/artix-installer.git && cd artix-installer && ./install.sh
+sudo pacman -Sy --needed --no-confirm git && git clone --depth=1 https://github.com/dim-ghub/artix-installer.git && cd artix-installer && ./install.sh
 ```
 4. When everything finishes, `poweroff`, remove the installation media, and boot into Artix. Post-installation networking is done with Connman.
 
