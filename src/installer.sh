@@ -22,8 +22,15 @@
 pkgs="base base-devel $MY_INIT elogind-$MY_INIT efibootmgr limine btrfs-progs wget dhcpcd wpa_supplicant connman-$MY_INIT hyprland kitty nano sddm sddm-openrc sudo"
 [ "$ENCRYPTED" = "y" ] && pkgs="$pkgs cryptsetup cryptsetup-$MY_INIT"
 
+# Clean up any previous mounts/swap from a failed run
+swapoff /mnt/swap/swapfile 2>/dev/null || true
+umount -R /mnt 2>/dev/null || true
+if [ "$ENCRYPTED" = "y" ]; then
+	cryptsetup close root 2>/dev/null || true
+fi
+
 # Partition disk
-printf "label: gpt\n,550M,U\n,,\n" | sfdisk "$MY_DISK"
+printf "label: gpt\n,550M,U\n,,\n" | sfdisk --force "$MY_DISK"
 
 # Format and mount partitions
 if [ "$ENCRYPTED" = "y" ]; then
