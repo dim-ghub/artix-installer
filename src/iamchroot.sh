@@ -86,6 +86,9 @@ if [ "$MY_INIT" = "openrc" ]; then
 	rc-update add connmand default
 fi
 
+# Enable [lib32] repository for 32-bit compatibility (Artix)
+sed -i '/^#\[lib32\]/,/^#Include = \/etc\/pacman.d\/mirrorlist/ s/^#//' /etc/pacman.conf
+
 # Configure mkinitcpio
 sed -i 's/BINARIES=()/BINARIES=(\/usr\/bin\/btrfs)/g' /etc/mkinitcpio.conf
 if [ "$ENCRYPTED" = "y" ]; then
