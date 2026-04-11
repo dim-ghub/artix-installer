@@ -11,9 +11,9 @@ A simple installer for Artix Linux with OpenRC support.
 ```
 sudo rfkill unblock wifi
 sudo ip link set wlan0 up
-connmanctl
+nmtui
 ```
-In Connman, use: `agent on`, `scan wifi`, `services`, `connect wifi_NAME`, `quit`
+In NetworkManager TUI, select Activate a Connection, select your network and follow instructions. Then, press escape and select Quit.
 
 3. Acquire the install scripts and run:
 ```
