@@ -69,8 +69,9 @@ fi
 
 # Create regular user
 if [ "$MAKE_SUDOER" = "y" ]; then
-	useradd -m -G wheel -s /bin/bash "$MY_USER"
-	sed -i '/%wheel ALL=(ALL) ALL/s/^#//g' /etc/sudoers
+	useradd -m -s /bin/bash "$MY_USER"
+	mkdir -p /etc/sudoers.d
+	printf '%s ALL=(ALL) ALL\n' "$MY_USER" >/etc/sudoers.d/00_"$MY_USER"
 else
 	useradd -m -s /bin/bash "$MY_USER"
 fi
