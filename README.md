@@ -32,11 +32,4 @@ sudo pacman -Sy --needed --noconfirm git && git clone --depth=1 https://github.c
 
 #### Package 404 errors during installation
 
-If you see `failed retrieving file ... The requested URL returned error: 404` for all mirrors, the ISO's package index is stale (the referenced package versions have been replaced on the mirrors). This installer now automatically refreshes package databases before installing, but if you still encounter this, run manually:
-
-```
-sudo rm -fr /var/lib/pacman/sync
-sudo pacman -Syy
-```
-
-Then re-run the installer.
+If you see `failed retrieving file ... The requested URL returned error: 404` for all mirrors, your ISO is outdated — the package versions it references no longer exist on the mirrors. Download the latest ISO from [artixlinux.org](https://artixlinux.org/download.php) and try again.

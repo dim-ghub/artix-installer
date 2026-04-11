@@ -80,11 +80,15 @@ for pkg in $pkgs; do
 	set -- "$@" "$pkg"
 done
 
-# Refresh package databases and update live system to avoid 404 errors from stale ISO indexes
-rm -fr /var/lib/pacman/sync
-pacman -Syyu --noconfirm
-
 # Install base system and kernel
-basestrap /mnt "$@"
-basestrap /mnt linux linux-firmware linux-headers mkinitcpio
+if ! basestrap /mnt "$@"; then
+	printf '\nERROR: Package installation failed.\n' >&2
+	printf 'Your ISO may be outdated. Download the latest ISO from https://artixlinux.org/download.php and try again.\n' >&2
+	exit 1
+fi
+if ! basestrap /mnt linux linux-firmware linux-headers mkinitcpio; then
+	printf '\nERROR: Kernel installation failed.\n' >&2
+	printf 'Your ISO may be outdated. Download the latest ISO from https://artixlinux.org/download.php and try again.\n' >&2
+	exit 1
+fi
 fstabgen -U /mnt >/mnt/etc/fstab
