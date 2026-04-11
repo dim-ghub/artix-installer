@@ -80,28 +80,21 @@ yes "$USER_PASSWORD" | passwd "$MY_USER"
 # Set up SDDM
 rc-update add sddm default
 
-# Add Artix Arch Linux repository support
-# Install the support package and download Arch mirrorlist
-pacman -Sy --noconfirm artix-archlinux-support
-wget -q https://archlinux.org/mirrorlist/all/ -O /etc/pacman.d/mirrorlist-arch
-sed -i '/^#Server/s/^#//' /etc/pacman.d/mirrorlist-arch
-
-# Uncomment lib32 repository
-sed -i '/^#\[lib32\]/,/^#Include = \/etc\/pacman.d\/mirrorlist/ s/^#//' /etc/pacman.conf
-
-# Add Arch repos to pacman.conf
-grep -q "^\[extra\]" /etc/pacman.conf || printf '\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
-grep -q "^\[multilib\]" /etc/pacman.conf || printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
-
-# Populate archlinux keyring
-pacman-key --populate archlinux
-pacman -Sy
-
 # Other stuff you should do
 if [ "$MY_INIT" = "openrc" ]; then
 	sed -i '/rc_need="localmount"/s/^#//g' /etc/conf.d/swap
 	rc-update add connmand default
 fi
+
+# Add Artix Arch Linux repository support (after all Artix package installs so Artix repos take priority)
+pacman -Sy --noconfirm artix-archlinux-support
+
+sed -i '/^#\[lib32\]/,/^#Include = \/etc\/pacman.d\/mirrorlist/ s/^#//' /etc/pacman.conf
+grep -q "^\[extra\]" /etc/pacman.conf || printf '\n[extra]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
+grep -q "^\[multilib\]" /etc/pacman.conf || printf '\n[multilib]\nInclude = /etc/pacman.d/mirrorlist-arch\n' >>/etc/pacman.conf
+
+pacman-key --populate archlinux
+pacman -Sy
 
 # Configure mkinitcpio
 sed -i 's/BINARIES=()/BINARIES=(\/usr\/bin\/btrfs)/g' /etc/mkinitcpio.conf
