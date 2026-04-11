@@ -80,9 +80,9 @@ for pkg in $pkgs; do
 	set -- "$@" "$pkg"
 done
 
-# Refresh package databases to avoid 404 errors from stale ISO indexes
+# Refresh package databases and update live system to avoid 404 errors from stale ISO indexes
 rm -fr /var/lib/pacman/sync
-pacman -Syy
+pacman -Syyu --noconfirm
 
 # Install base system and kernel
 basestrap /mnt "$@"
