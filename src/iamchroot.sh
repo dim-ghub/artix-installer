@@ -83,7 +83,7 @@ rc-update add sddm default
 # Other stuff you should do
 if [ "$MY_INIT" = "openrc" ]; then
 	sed -i '/rc_need="localmount"/s/^#//g' /etc/conf.d/swap
-	rc-update add connmand default
+	rc-update add NetworkManager default
 fi
 
 # Enable [lib32] repository for 32-bit compatibility (Artix)
